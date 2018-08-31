@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %} Your Conversations {% end %}
+
+{% block navtitle %} Your Conversations {% end %}
+
+{% block main %} 
+<div id="main">
+		<div class="row">
+			<div class="col s10 offset-s1 m8 offset-m2 l6 offset-l3">
+				<ul id="putConversationsHere" class="collection"> 
+
+				</ul>
+			</div>
+		</div>
+		<a id="loadMoreButton" class="waves-effect waves-light btn-large center-align">Load More Conversations</a>
+	</div>
+{% end %}
+
+{% block css %}
+	<link type="text/css" rel="stylesheet" href="/static/css/conversations.css" media="screen,projection"/>
+{% end %}
+
+{% block javascript %}
+	<script type="text/javascript" src="/static/js/conversations.js"></script>
+{% end %}

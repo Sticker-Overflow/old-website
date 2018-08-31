@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+	<head>
+
+		<link type="text/css" rel="stylesheet" href="/static/css/materialIcons.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/materialize.css"    media="screen,projection"/>
+		<link type="text/css" rel="stylesheet" href="/static/css/base.css"    media="screen,projection"/>
+		
+		<link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
+		
+		<script type="text/javascript" src="/static/js/jquery.js"></script>
+		<script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/4.11.0/firebase.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/4.11.0/firebase-firestore.js"></script>
+
+		<script>
+		  // Initialize Firebase
+		  var config = {
+		    apiKey: "AIzaSyC5x_SZTHN8UcVYw2aQioJE2fOqXdE3Mcg",
+		    authDomain: "stickeroverflow-1d318.firebaseapp.com",
+		    databaseURL: "https://stickeroverflow-1d318.firebaseio.com",
+		    projectId: "stickeroverflow-1d318",
+		    storageBucket: "stickeroverflow-1d318.appspot.com",
+		    messagingSenderId: "951520957692"
+		  };
+		  firebase.initializeApp(config);
+		</script>
+
+		<script src="https://cdn.firebase.com/libs/firebaseui/2.6.3/firebaseui.js"></script>
+	    	<link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.6.3/firebaseui.css" />
+		<script type="text/javascript">
+			// FirebaseUI config.
+			var uiConfig = {
+				callbacks : {
+					signInSuccess: function(currentUser, credential, redirectUrl) {
+						onSignIn(currentUser);
+						return true;
+					},
+				},
+				signInFlow: "popup",
+				signInOptions: [
+					firebase.auth.GoogleAuthProvider.PROVIDER_ID
+				],
+				tosUrl: '/help'
+			};
+
+			function onSignIn(currentUser) {
+				var xhr = new XMLHttpRequest();
+				xhr.open("POST", "/signin");
+				xhr.setRequestHeader("Content-type", "application/json");
+				xhr.onreadystatechange = function() {
+					if(xhr.readyState === 4 && xhr.status === 200) {
+						if(JSON.parse(xhr.response)["Result"] === true) {
+							window.location.href = "/stickers";
+						}
+					}
+				};
+				xhr.send(JSON.stringify({"uid": currentUser.uid, "name": currentUser.displayName, "photoUrl": currentUser.photoURL, "email": currentUser.email}));
+				$.cookie("jUid", currentUser.uid, { domain: '.stickeroverflow.io'});
+				$.cookie("jName", currentUser.displayName, { domain: '.stickeroverflow.io'});
+				$.cookie("jPhotoURL", currentUser.photoURL, { domain: '.stickeroverflow.io'});
+				$.cookie("jEmail", currentUser.email, { domain: '.stickeroverflow.io'});	
+			}
+
+			// Initialize the FirebaseUI Widget using Firebase.
+			var ui = new firebaseui.auth.AuthUI(firebase.auth());
+			// The start method will wait until the DOM is loaded.
+			ui.start('#firebaseui-auth-container', uiConfig);
+		</script>
+
+		<meta name="google-signin-client_id" content="951520957692-b7p4e79d6pbh51qsosvfeot28o1flrm7.apps.googleusercontent.com">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>		
+		<title>Sticker Overflow</title>
+	</head>
+	<body>
+
+		<nav>
+			<div class="nav-wrapper-fixed">
+				<a href="#" class="brand-logo center">Sticker Overflow</a>
+			</div>
+		</nav>
+
+		<div id="main">
+			<div id="signin_holder" class="valign-wrapper">
+				<div id="firebaseui-auth-container"></div>
+			</div>
+		</div>
+
+		<script type="text/javascript" src="/static/js/materialize.js"></script>
+		<script type="text/javascript" src="/static/js/base.js"></script>
+		<script src="https://apis.google.com/js/platform.js" async defer></script>
+
+	</body>
+</html>

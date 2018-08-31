@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %} {{ documentData['name'] }} {% end %}
+
+{% block navtitle %} {{ documentData["name"] }} {% end %}
+
+{% block main %} 
+	 <div id="main">
+                <div class="row">
+                        <div id="mainContent" class="col s12 m8 offset-m2 l4 offset-l1">
+                                <div id="leftHolder">
+                                        <div class="card-panel grey lighten-5 z-depth-1">
+                                                <div class="row valign-wrapper">
+                                                        <div class="col s12">
+                                                                <img id="hackathon-image" class="materialboxed responsize-img" src="{{ documentData['splashURL'] }}" alt="{{ documentData['name'] }}">
+							</div>
+                                                </div>
+                                        </div>
+                                        <div class="card-panel grey lighten-5 z-depth-1">
+                                                <div class="row">
+                                                        <div class="info-title col s12">
+                                                                <span class="black-text">Hackathon Info</span>
+                                                        </div>
+                                                </div>
+
+                                                <div class="row valign-wrapper">
+                                                        <div class="rjust col s5 m4 l3">
+                                                                <span class="black-text">Name: </span>
+                                                                <br>
+                                                                <span class="black-text">Location: </span>
+                                                                <br>
+                                                                <span class="black-text">Date: </span>
+                                                                <br>
+                                                                <span class="black-text">Website: </span>
+                                                        </div>
+                                                        <div class="ljust col s7 m8 l9">
+                                                                <span class="black-text">{{ documentData["name"] }}</span>
+                                                                <br>
+                                                                <span class="black-text">{{ documentData["location"] }}</span>
+                                                                <br>
+                                                                <span class="black-text">{{ documentData["dateString"] }}</span>
+                                                                <br>
+                                                                <span class="black-text">{{ documentData["url"] }}</span>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                        <div class="card-panel grey lighten-5 z-depth-1">
+                                                <div class="row">
+                                                        <div id="putOrganizersHere" class="col s10 offset-s1">
+                                                                <div class="info-title col s12">
+                                                                        <span class="black-text">Organizers</span>
+                                                                </div>
+                                                        </div>
+                                                </div>
+						 <div class="row">
+                                                        <div id="putSponsorsHere" class="col s10 offset-s1">
+                                                                <div class="info-title col s12">
+                                                                        <span class="black-text">Sponsors</span>
+                                                                </div>
+                                                        </div>
+                                                </div>
+                                        </div>
+                                </div>
+                        </div>
+
+                        <div id="subcollections" class="col s12 m12 l5 offset-l1">
+                                <h4 class="black-text">Stickers</h4>
+                                <div id="putStickersHere" class="row">
+
+                                </div>
+                        </div>
+                </div>
+        </div>
+{% end %}
+
+{% block css %}
+	<link type="text/css" rel="stylesheet" href="/static/css/hackathons.css" media="screen,projection"/>
+{% end %}
+
+{% block javascript %}
+	<script>
+                $(document).ready(function(){
+			$("#search-icon").hide();
+                        $('.materialboxed').materialbox();
+                        enablePushPin();
+                        var pPin = true;
+                        var onresize = function(e) {
+                                width = e.target.outerWidth;
+                                if(width > 992 && pPin === false) {
+                                        enablePushPin();
+                                } else if(width < 993 && pPin === true) {
+                                        disablePushPin();
+                                }
+                        }
+                        window.addEventListener("resize", onresize);
+                        if($( window ).width() < 993) {
+                                disablePushPin();       
+                        }
+                        var config = {
+                                apiKey: "AIzaSyC5x_SZTHN8UcVYw2aQioJE2fOqXdE3Mcg",
+                                authDomain: "stickeroverflow-1d318.firebaseapp.com",
+                                databaseURL: "https://stickeroverflow-1d318.firebaseio.com",
+                                projectId: "stickeroverflow-1d318",
+                                storageBucket: "stickeroverflow-1d318.appspot.com",
+                                messagingSenderId: "951520957692"
+                        };
+                        firebase.initializeApp(config);
+                
+                        var db = firebase.firestore();
+                        var storage = firebase.storage();
+                        
+                        db.collection("hackathons").doc("{{ documentData['id'] }}").collection("stickers").orderBy("dateAdded", "desc").orderBy("name").get().then((querySnapshot) => {
+                                querySnapshot.forEach((stickerDoc) => {
+                                        storage.ref("stickers/" + stickerDoc.data().id + "/" + stickerDoc.data().id + ".png").getDownloadURL().then(function(url) {
+                                                $("#putStickersHere").append(createStickerCard(stickerDoc.data().id, url));
+                                        });                                       
+                                });
+                        });
+
+                        db.collection("hackathons").doc("{{ documentData['id'] }}").collection("organizers").orderBy("name").orderBy("location").get().then((querySnapshot) => {
+                                querySnapshot.forEach((organizerDoc) => {
+                                        $("putHackathonsHere").append(createOrganizerCard(organizerDoc.data().id, organizerDoc.data().name, organizerDoc.data().logoURL, organizerDoc.data().location));
+                                });
+                        });
+
+			db.collection("hackathons").doc("{{ documentData['id'] }}").collection("sponsors").orderBy("name").orderBy("location").get().then((querySnapshot) => {
+                                querySnapshot.forEach((sponsorDoc) => {
+                                        $("putSponsorsHere").append(createSponsorCard(sponsorDoc.data().id, sponsorDoc.data().name, sponsorDoc.data().logoURL, sponsorDoc.data().location));
+                                });
+                        });
+                                        
+                        function createStickerCard(id, image) {
+                                var html = '<div class="col s6 m6 l4">' +
+                                                '<div id="' + id + '" class="sticker hoverable">' +
+                                                        '<a href="/stickers/' + id + '"><img class="sticker-image" src="' + image + '"></a>' +
+                                                '</div>' +
+                                        '</div>'
+                                return html;
+                        }
+			
+			function createSponsorCard(id, name, logo, location) {
+                                 var html = '<a href="/sponsors/' + id + '">' +
+                                                '<div id="' + id + '" class="card-panel grey lighten-5 z-depth-1 hoverable">' +
+                                                        '<div class="row valign-wrapper">' +
+                                                                '<div class="col s1">' +
+                                                                        '<div class="logo-container valign-wrapper">' +
+                                                                                '<img class="sponsor-logo clickable" src="' + logo + '" alt="' + name + '">' +
+                                                                        '</div>' +
+                                                                '</div>' +
+                                                                '<div class="col s8">' +
+                                                                        '<span class="black-text">' + name + '</span>' +
+                                                                        '<br>' +
+                                                                        '<span class="black-text">' + location + '</span>' +
+                                                                '</div>' +
+                                                        '</div>' +
+                                                '</div>' +
+                                        '</a>';
+                                return html;          
+                        }
+
+			function createOrganizerCard(id, name, logo, location) {
+                                 var html = '<a href="/organizers/' + id + '">' +
+                                                '<div id="' + id + '" class="card-panel grey lighten-5 z-depth-1 hoverable">' +
+                                                        '<div class="row valign-wrapper">' +
+                                                                '<div class="col s1">' +
+                                                                        '<div class="logo-container valign-wrapper">' +
+                                                                                '<img class="organizer-logo clickable" src="' + logo + '" alt="' + name + '">' +
+                                                                        '</div>' +
+                                                                '</div>' +
+                                                                '<div class="col s8">' +
+                                                                        '<span class="black-text">' + name + '</span>' +
+                                                                        '<br>' +
+                                                                        '<span class="black-text">' + location + '</span>' +
+                                                                '</div>' +
+                                                        '</div>' +
+                                                '</div>' +
+                                        '</a>';
+                                return html;          
+                        }
+
+                        function enablePushPin() {
+                                pPin = true;
+                                $('#leftHolder').pushpin({
+                                        top: 200,
+                                        offset: 15,
+                                });
+                        }
+                        
+                        function disablePushPin() {
+                                pPin = false;
+                                $("#leftHolder").pushpin('remove');
+                        }
+		});
+	</script>
+{% end %}

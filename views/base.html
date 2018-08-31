@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+	<head>
+
+		<link type="text/css" rel="stylesheet" href="/static/css/materialIcons.css">
+		<link type="text/css" rel="stylesheet" href="/static/css/materialize.css"    media="screen,projection"/>
+		<link type="text/css" rel="stylesheet" href="/static/css/base.css"    media="screen,projection"/>
+		<link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png">
+		<script src="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.js"></script>
+		<link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/2.5.1/firebaseui.css" />
+		{% block css %} {% end %}
+		<meta name="google-signin-client_id" content="951520957692-b7p4e79d6pbh51qsosvfeot28o1flrm7.apps.googleusercontent.com">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>		
+		<title>{% block title %} Sticker Overflow {% end %}</title>
+	</head>
+	<body>
+
+		<nav>
+			<div class="nav-wrapper-fixed">
+				<a href="#" data-activates="mobile-demo" class="button-collapse show-on-large"><i class="material-icons">menu</i></a>
+				<a href="#" id="navtitle" class="brand-logo center">{% block navtitle %} Sticker Overflow {% end %}</a>
+
+				<ul class="right">
+					<li>
+						<a href="#" id="search-icon"><i class="material-icons">search</i></a>
+					</li>
+				</ul>
+
+				<div class="right">
+					<form>
+						<div class="input-field" style="display:none" id="search-div">
+							<input type="search" id="search-bar" name="">
+							<i class="material-icons" id="close-icon">close</i>						
+						</div>
+					</form>
+				</div>
+				
+
+				<ul class="side-nav light-grey" id="mobile-demo">
+					<li>
+						<div class="user-view">
+							<div class="background">
+								<img src="/static/images/office.jpg">
+							</div>
+							<img id="user-photo" class="circle" src="/static/images/profile.jpg">
+							<span id="user-name" class="white-text name">{% block user-name %} Spenser Solys {% end %}</span>
+							<a id="user-email-mt" href="mailto:{% block user-email %} solysspenser@gmail.com {% end %}">
+								<span id="user-email" class="white-text email">{% block user-email %} scub3d@scub3d.io {% end %}</span>
+							</a>
+						</div>
+					</li>
+					<li>
+						<a href="/identify" class="sideThing">
+							<i class="material-icons">camera</i>ID a Sticker
+						</a>
+					</li>
+					<li>
+						<a href="/stickers" class="sideThing">
+							<i class="material-icons">image</i>Stickers
+						</a>
+					</li>
+					<li>
+						<a href="/hackathons" class="sideThing">
+							<i class="material-icons">events</i>Hackathons
+						</a>
+					</li>
+					<li>
+						<a href="/sponsors" class="sideThing">
+							<i class="material-icons">work</i>Sponsors
+						</a>
+					</li>
+					<li>
+						<a href="/organizers" class="sideThing">
+							<i class="material-icons">business</i>Organizers
+						</a>
+					</li>
+					<li>
+						<a href="/users" class="sideThing">
+							<i class="material-icons">person</i>Users
+						</a>
+					</li>
+
+					<li>
+						<a href="/conversations" class="sideThing">
+							<i class="material-icons">chat</i>Chat
+						</a>
+					</li>
+
+					<li>
+						<a href="/account" id="account" class="sideThing">
+							<i class="material-icons">account_circle</i>Account
+						</a>
+					</li>
+
+					<li>
+						<a href="/signout" id="signout" class="sideThing">
+							<i class="material-icons">exit_to_app</i>Sign Out
+						</a>
+					</li>				
+				</ul>
+			</div>
+		</nav>
+
+		{% block main %} <div></div> {% end %}
+		
+		<script src="https://www.gstatic.com/firebasejs/4.11.0/firebase.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/4.11.0/firebase-firestore.js"></script>
+		<script type="text/javascript" src="/static/js/jquery.js"></script>
+		<script type="text/javascript" src="/static/js/jquery.cookie.js"></script>
+		<script type="text/javascript" src="/static/js/materialize.js"></script>
+		<script type="text/javascript" src="/static/js/base.js"></script>
+		<script src="https://apis.google.com/js/platform.js" async defer></script>
+
+		{% block javascript %} {% end %}
+
+	</body>
+</html>

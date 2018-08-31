@@ -1,0 +1,53 @@
+#main {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.card-panel {
+        padding: 24px 24px 24px 24px;
+}
+
+.remove-bottom-margin {
+        margin-bottom: 0px !important;
+}
+
+.users-name {
+        font-size: 1.5rem;
+}
+
+.row {
+        margin-bottom: 0px !important;
+}
+
+.materialboxed {
+        display: inline !important;
+}
+
+.sticker-check-box {
+	position: absolute;
+	top: 6px;
+	right: 15px;
+}
+
+.hackathon-check-box {
+	position: absolute;
+	top: 6px;
+	right: 15px;
+}
+
+.modal-sticker-container {
+	position: relative;
+}
+
+.modal-hackathon-container {
+	position: relative;
+}
+
+.modal-content a {
+	text-align: center;
+}
+
+.ljust {
+        text-align: left;
+        text-justify: true;
+}

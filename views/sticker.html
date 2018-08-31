@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %} {{ documentData["name"] }} {% end %}
+
+{% block navtitle %} {{ documentData["name"] }} {% end %}
+
+{% block main %} 
+	<div id="main">
+		<div class="row">
+			<div id="mainContent" class="col s12 m8 offset-m2 l4 offset-l1">
+				<div id="leftHolder">
+					<div class="card-panel grey lighten-5 z-depth-1">
+						<div class="row valign-wrapper">
+							<div class="col s12">
+								<img id="sticker-image" class="materialboxed" src="" alt="{{ documentData['name'] }}" class="responsive-img">
+							</div>
+						</div>
+					</div>
+					<div class="card-panel grey lighten-5 z-depth-1">
+						<div class="row">
+							<div class="info-title col s12">
+								<span class="black-text">Sticker Info</span>
+							</div>
+						</div>
+
+						<div class="row valign-wrapper">
+							<div class="rjust col s5 m4 l3">
+								<span class="black-text">Name: </span>
+								<br>
+								<span class="black-text">Description: </span>
+								<br>
+								<span class="black-text">Date Added: </span>
+								<br>
+								<span class="black-text">User Count: </span>
+							</div>
+							<div class="ljust col s7 m8 l9">
+								<span class="black-text">{{ documentData["name"] }}</span>
+								<br>
+								<span class="black-text">{{ documentData["description"] }}</span>
+								<br>
+								<span class="black-text">{{ documentData["dateAdded"] }}</span>
+								<br>
+								<span class="black-text">{{ documentData["numberOfUsersWhoHaveThisSticker"] }}</span>
+							</div>
+						</div>
+					</div>
+					<div class="card-panel grey lighten-5 z-depth-1">
+						<div class="row">
+							<div id="putOrgsHere" class="col s10 offset-s1">
+								<div class="info-title col s12">
+									<span class="black-text">Given Out By</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="subcollections" class="col s12 m12 l5 offset-l1">
+				<h4 class="black-text">Handed Out At</h4>
+				<div id="putHackathonsHere" class="row">
+
+				</div>
+			</div>
+		</div>
+	</div>
+{% end %}
+
+{% block css %}
+	<link type="text/css" rel="stylesheet" href="/static/css/stickers.css" media="screen,projection"/>
+{% end %}
+
+{% block javascript %}
+	<script>	
+		$(document).ready(function(){
+			$("#search-icon").hide();
+			$('.materialboxed').materialbox();
+			enablePushPin();
+			var pPin = true;
+			var onresize = function(e) {
+				width = e.target.outerWidth;
+				if(width > 992 && pPin === false) {
+					enablePushPin();
+				} else if(width < 993 && pPin === true) {
+					disablePushPin();
+				}
+			}
+
+			window.addEventListener("resize", onresize);
+			if($( window ).width() < 993) {
+				disablePushPin();	
+			}
+
+			var config = {
+				apiKey: "AIzaSyC5x_SZTHN8UcVYw2aQioJE2fOqXdE3Mcg",
+				authDomain: "stickeroverflow-1d318.firebaseapp.com",
+				databaseURL: "https://stickeroverflow-1d318.firebaseio.com",
+				projectId: "stickeroverflow-1d318",
+				storageBucket: "stickeroverflow-1d318.appspot.com",
+				messagingSenderId: "951520957692"
+			};
+			firebase.initializeApp(config);
+		
+			var db = firebase.firestore();
+
+			var storage = firebase.storage();
+
+			db.collection("stickers").doc("{{ documentData['id'] }}").get().then(function(document) {
+				if(document.exists) {
+					storage.ref("stickers/{{ documentData['id'] }}/{{ documentData['id'] }}.png").getDownloadURL().then(function(url) {
+						$("#sticker-image").attr("src", url);
+					});
+				}
+			});
+
+			db.collection("stickers").doc("{{ documentData['id'] }}").collection("organizations").orderBy("name").orderBy("location").get().then((querySnapshot) => {
+				querySnapshot.forEach((orgDoc) => {
+					$("#putOrgsHere").append(createOrgCard(orgDoc.data().id, orgDoc.data().name, orgDoc.data().location, orgDoc.data().logoURL));
+				});
+			});
+
+			db.collection("stickers").doc("{{ documentData['id'] }}").collection("hackathons").orderBy("name").orderBy("location").get().then((querySnapshot) => {
+				querySnapshot.forEach((hackathonDoc) => {
+					$("putHackathonsHere").append(createHackathonCard(hackathonDoc.data().id, hackathonDoc.data().name, hackathonDoc.data().logoURL, hackathonDoc.data().splashURL, hackathonDoc.data().location, hackathonDoc.data().dateString));
+				});
+			});
+
+			function createOrgCard(id, name, location, logo) {
+				var html = '<div id="' + id + '" class="card-panel grey lighten-5 z-depth-3">' + 
+						'<div class="row valign-wrapper">' + 
+							'<div class="col s3 offset-s1">' + 
+								'<img src="' + logo + '" alt="' + name + '" class="responsive-img">'
+							'</div>' +
+							'<div class="ljust col s8">' +
+								'<span class="black-text">' + name + '</span>' +
+								'<br>' +
+								'<span class="black-text">' + location + '</span>' +
+							'</div>' +
+						'</div>' +
+					'</div>';
+
+				return html;		
+			}
+
+			function createHackathonCard(id, name, logo, splash, location, date) {
+				var html = '<div class="col s12 m6 l4">' +
+						'<div id="' + id + '" class="card">' +
+							'<div class="card-image">' +
+								'<a href="/hackathons/' + id + '"><img class="hackathon-splash clickable" src="' + splash + '"></a>' +
+							'</div>' +
+								'<img class="hackathon-logo z-depth-5" src="' + logo + '">' +
+							'<div class="card-content hackathon-details">' +
+								'<p class="center-align hackathon-name">' + name + '</p>' +
+								'<p class="center-align">' + location + '</p>' +
+								'<p class="center-align">' + date + '</p>' +
+							'</div>' +
+						'</div>' +
+					'</div>'
+				return html;		
+			}
+
+			function enablePushPin() {
+				pPin = true;
+				$("#leftHolder").pushpin({
+					top: 200,
+					offset: 15,
+				});
+			}
+			
+			function disablePushPin() {
+				pPin = false;
+				$("#leftHolder").pushpin('remove');
+			}
+			
+		});
+
+	</script>
+{% end %}

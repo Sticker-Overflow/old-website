@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %} Conversations with {% end %}
+
+{% block navtitle %} Conversations with {% end %}
+
+{% block main %} 
+	<div id="main">
+		<div class="row">
+			<div class="col s10 offset-s1 m8 offset-m2 l6 offset-l3">
+				<div id="putMessagesHere"> 
+
+				</div>
+				<div class="row">
+      					<form class="col s8 offset-s2">
+        					<div class="row">
+          						<div class="input-field col s10">
+            							<input id="input_text" class="text" data-length="2000"></input>
+          						</div>
+							<div class="col s1">
+								<button id="sendMessage" class="send-message-button btn waves-effect waves-light">Send
+  	  								<i class="material-icons right">send</i>
+  								</button>
+							</div>
+        					</div>
+      					</form>
+    				</div>
+			</div>
+		</div>
+	</div>
+{% end %}
+
+{% block css %}
+	<link type="text/css" rel="stylesheet" href="/static/css/conversations.css" media="screen,projection"/>
+{% end %}
+
+{% block javascript %}
+	<script>
+		$(document).ready(function(){
+			$("#search-icon").hide();
+			$('input#input_text').characterCounter();
+			var config = {
+				apiKey: "AIzaSyC5x_SZTHN8UcVYw2aQioJE2fOqXdE3Mcg",
+				authDomain: "stickeroverflow-1d318.firebaseapp.com",
+				databaseURL: "https://stickeroverflow-1d318.firebaseio.com",
+				projectId: "stickeroverflow-1d318",
+				storageBucket: "stickeroverflow-1d318.appspot.com",
+				messagingSenderId: "951520957692"
+			};
+			firebase.initializeApp(config);
+		
+				// Initialize Cloud Firestore through Firebase
+			var db = firebase.firestore()
+;
+			$("#sendMessage").click(function(e) {
+				e.preventDefault();
+				var message = {
+					id: uuidv4(),
+					senderId: $.cookie("jUid"),
+					text: $("#input_text").val(),
+					createdAt: new Date().getTime(),
+					hasBeenRead: false
+				};
+				db.collection("users").doc(message.senderId).collection("conversations").doc("{{ conversation['id'] }}").collection("messages").doc(message.id).set(message);
+			});
+			db.collection("users").doc($.cookie("jUid")).collection("conversations").doc("{{ conversation['id'] }}").update({numberOfUnreadMessages: 0});
+			db.collection("users").doc("{{ conversation['otherUserId'] }}").get().then((userSnapshot) => {
+				db.collection("users").doc($.cookie("jUid")).collection("conversations").doc("{{ conversation['id'] }}").collection("messages").orderBy("createdAt").orderBy("text").onSnapshot(function(snapshot) {
+					snapshot.docChanges.forEach(function(change) {
+						if(change.type === "added") {
+							if(change.doc.data().senderId !== "{{ conversation['otherUserId'] }}") {
+								$("#putMessagesHere").append(createMessage(change.doc.data().id, change.doc.data().text, $.cookie("jPhotoURL"), change.doc.data().createdAt, "", "right"));
+							} else {
+								$("#putMessagesHere").append(createMessage(change.doc.data().id, change.doc.data().text, userSnapshot.data().photoUrl, change.doc.data().createdAt, "darker", "left"));
+							}
+							db.collection("users").doc($.cookie("jUid")).collection("conversations").doc("{{ conversation['id'] }}").collection("messages").doc(change.doc.data().id).update({hasBeenRead: true});
+						}
+					});
+				});
+			});
+		});
+	
+		function uuidv4() {
+			return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+   				(c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+  			)
+		}
+	
+		function createMessage(id, text, userPhoto, createdAt, containerModifier, lr) {
+			var createdAtDate = new Date(createdAt);
+			var html = "<div id='" + id + "' class='container " + containerModifier + "'>" + 
+					"<img src='" + userPhoto + "' alt='' class='" + lr + "'>" + 
+					"<div class='t-" + lr + "'>" + 
+						"<p class='" + lr + "'>" + text +
+						'<span class="time-' + lr + '">' + createdAtDate.customFormat("#hh#:#mm# #ampm#") + '</span></p>' + 
+				   	"</div" + 		
+				   "</div>";  
+			return html;
+		}	
+	</script>		
+{% end %}

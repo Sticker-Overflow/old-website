@@ -1,0 +1,421 @@
+{% extends "base.html" %}
+
+{% block title %} Account {% end %}
+
+{% block navtitle %} Account {% end %}
+
+{% block main %}
+        <div id="main">
+                <div class="row">
+                        <div id="upcomingHackathons" class="col s12 m6 l3">
+                                <h4 class="black-text">Upcoming Hackathons
+					<a class="waves-effect waves-light btn modal-trigger" href="#addUpcomingHackathonsModal">
+						<i class="material-icons">menu</i>
+					</a>
+				</h4>
+				
+                                <div id="putUpcomingHackathonsHere" class="row">
+
+                                </div>
+                        </div>
+                        <div id="attendedHackathons" class="col s12 m6 l3">
+                                <h4 class="black-text">Attended Hackathons
+					<a class="waves-effect waves-light btn modal-trigger" href="#addAttendedHackathonsModal">
+						<i class="material-icons">menu</i>
+					</a>
+				</h4>
+
+                                <div id="putAttendedHackathonsHere" class="row">
+
+                                </div>
+                        </div>
+                        <div id="stickers" class="col s12 m12 l6">
+                                <h4 class="black-text">Stickers
+					<a class="waves-effect waves-light btn modal-trigger" href="#addStickersModal">
+                                                <i class="material-icons">menu</i>
+                                        </a>	
+				</h4>
+
+                                <div id="putStickersHere" class="row">
+
+                                </div>
+                        </div>
+                </div>
+        </div>
+
+	<div id="addStickersModal" class="modal modal-fixed-footer">
+		<div class="modal-content">
+			<h4>Add Stickers</h4>
+			<div id="putModalStickersHere" class="row">
+			
+			</div>
+			<a id="loadMoreModalStickersButton" class="waves-effect waves-light btn-large center-align">Load More Stickers</a>
+		</div>
+		<div class="modal-footer">
+			<a id="declineAddStickers" href="#" class="modal-action modal-close waves-effect waves-green btn-flat">Nope</a>
+			<a id="confirmAddStickers" href="#" class="modal-action modal-close waves-effect waves-green btn-flat disabled">Confirm</a>
+		</div>
+	</div>
+	
+	<div id="addUpcomingHackathonsModal" class="modal modal-fixed-footer">
+                <div class="modal-content">
+                        <h4>Add Hackathonss</h4>
+                        <div id="putModalUpcomingHackathonsHere" class="row putModalHackathonsHere">
+
+                        </div>
+                        <a id="loadMoreModalUpcomingHackathonsButton" class="waves-effect waves-light btn-large center-align">Load More Hackathons</a>
+                </div>
+                <div class="modal-footer">
+                        <a id="declineAddUpcomingHackathons" href="#" class="modal-action modal-close waves-effect waves-green btn-flat">Nope</a>
+                        <a id="confirmAddUpcomingHackathons" href="#" class="confirmAddHackathons modal-action modal-close waves-effect waves-green btn-flat disabled">Confirm</a>
+                </div>
+        </div>
+
+	<div id="addAttendedHackathonsModal" class="modal modal-fixed-footer">
+                <div class="modal-content">
+                        <h4>Add Hackathonss</h4>
+                        <div id="putModalAttendedHackathonsHere" class="row putModalHackathonsHere">
+
+                        </div>
+                        <a id="loadMoreModalAttendedHackathonsButton" class="waves-effect waves-light btn-large center-align">Load More Hackathons</a>
+                </div>
+                <div class="modal-footer">
+                        <a id="declineAddAttendedHackathons" href="#" class="modal-action modal-close waves-effect waves-green btn-flat">Nope</a>
+                        <a id="confirmAddAttendedHackathons" href="#" class="confirmAddHackathons modal-action modal-close waves-effect waves-green btn-flat disabled">Confirm</a>
+                </div>
+        </div>
+
+{% end %}
+
+{% block css %}
+        <link type="text/css" rel="stylesheet" href="/static/css/account.css" media="screen,projection"/>
+{% end %}
+
+{% block javascript %}
+        <script>
+                $(document).ready(function(){   
+                        $("#search-icon").hide();
+                	$('#addStickersModal').modal({
+				ready: function() {
+					populateStickerModal();
+				},
+				complete: function() {
+					teardownStickerModal();
+				},
+			});
+
+			$('#addUpcomingHackathonsModal').modal({
+				ready: function() {
+					populateUpcomingHackathonModal();
+				},
+				complete: function() {
+					teardownUpcomingHackathonModal();
+				},
+			});
+
+			$('#addAttendedHackathonsModal').modal({
+				ready: function() {
+					populateAttendedHackathonModal();
+				},
+				complete: function() {
+					teardownAttendedHackathonModal();
+				},
+			});		
+
+		        var config = {
+                                apiKey: "AIzaSyC5x_SZTHN8UcVYw2aQioJE2fOqXdE3Mcg",
+                                authDomain: "stickeroverflow-1d318.firebaseapp.com",
+                                databaseURL: "https://stickeroverflow-1d318.firebaseio.com",
+                                projectId: "stickeroverflow-1d318",
+                                storageBucket: "stickeroverflow-1d318.appspot.com",
+                                messagingSenderId: "951520957692"
+                        };
+                        firebase.initializeApp(config);
+                
+                        db = firebase.firestore();
+                        storage = firebase.storage();
+
+                        db.collection("users").doc("{{ documentData['uid'] }}").collection("stickers").orderBy("dateAdded", "desc").orderBy("name").get().then((querySnapshot) => {
+                                querySnapshot.forEach((stickerDoc) => {
+                                        storage.ref("stickers/" + stickerDoc.data().id + "/" + stickerDoc.data().id + ".png").getDownloadURL().then(function(url) {
+                                                $("#putStickersHere").append(createStickerCard(stickerDoc.data().id, url));
+                                        });                                       
+                                });
+                        });
+
+                        db.collection("users").doc("{{ documentData['uid'] }}").collection("upcomingHackathons").orderBy("date", "desc").orderBy("name").get().then((querySnapshot) => {
+                                querySnapshot.forEach((hackathonDoc) => {
+                                        $("#putUpcomingHackathonsHere").append(createHackathonCard(hackathonDoc.data().id, hackathonDoc.data().name, hackathonDoc.data().logoURL, hackathonDoc.data().location, hackathonDoc.data().dateString));
+                                });
+                        });
+                        
+                        db.collection("users").doc("{{ documentData['uid'] }}").collection("attendedHackathons").orderBy("date", "desc").orderBy("name").get().then((querySnapshot) => {
+                                querySnapshot.forEach((hackathonDoc) => {
+                                        $("#putAttendedHackathonsHere").append(createHackathonCard(hackathonDoc.data().id, hackathonDoc.data().name, hackathonDoc.data().logoURL, hackathonDoc.data().location, hackathonDoc.data().dateString));
+                                });
+                        });                     
+                });
+                
+                function createStickerCard(id, image) {
+                        var html = '<div class="col s6 m6 l4">' +
+                                        '<div id="' + id + '" class="sticker hoverable">' +
+                                                '<a href="/stickers/' + id + '"><img class="sticker-image" src="' + image + '"></a>' +
+                                        '</div>' +
+                                '</div>'
+                        return html;
+                }
+		
+		function createHackathonCard(id, name, logo, location, date) {
+                	var html = '<div class="col s12">' +  
+                                        '<a href="/hackathons/' + id + '">' +
+                                                '<div id="' + id + '" class="card-panel grey lighten-5 z-depth-1 hoverable">' +
+                                                        '<div class="row valign-wrapper">' +
+                                                                '<div class="col s4">' +
+                                                                        '<div class="logo-container valign-wrapper">' +
+                                                                                '<img class="hackathon-logo" src="' + logo + '" alt="' + name + '">' +
+                                                                        '</div>' +
+                                                                '</div>' +
+                                                                '<div class="col s8 ljust">' +
+                                                                        '<span class="black-text">' + name + '</span>' +
+                                                                        '<br>' +
+                                                                        '<span class="black-text">' + location + '</span>' +
+                                                                        '<br>' +
+                                                                        '<span class="black-text">' + date + '</span>' +
+                                                                '</div>' +
+                                                        '</div>' +
+                                                '</div>' +
+                                        '</a>' +
+                                '</div>';
+                        return html;          
+		}
+		
+		var modalCursor = null;
+		function populateStickerModal() {
+			db.collection("stickers").orderBy("dateAdded", "desc").orderBy("name").limit(30).get().then((querySnapshot) => {
+				querySnapshot.forEach((doc) => {
+					modalCursor = doc;
+
+					storage.ref("stickers/" + doc.data().id + "/" + doc.data().id + ".png").getDownloadURL().then(function(url) {
+						$("#putModalStickersHere").append(createModalStickerCard(doc.data().id, url));
+					});
+				});
+			});
+		}
+				
+		function populateStickerModalMore() {
+			db.collection("stickers").orderBy("dateAdded", "desc").orderBy("name").limit(30).startAfter(modalCursor).get().then((querySnapshot) => {
+				querySnapshot.forEach((doc) => {
+					modalCursor = doc;
+					storage.ref("stickers/" + doc.data().id + "/" + doc.data().id + ".png").getDownloadURL().then(function(url) {
+						$("#putModalStickersHere").append(createModalStickerCard(doc.data().id, url));
+					});
+				});
+			});
+		}
+
+		function populateUpcomingHackathonModal() {
+                        db.collection("hackathons").orderBy("date", "desc").orderBy("name").limit(30).get().then((querySnapshot) => {
+                                querySnapshot.forEach((doc) => {
+                                        modalCursor = doc;
+                       	                $("#putModalUpcomingHackathonsHere").append(createModalHackathonCard(doc.data().id, doc.data().name, doc.data().logoURL,  doc.data().location, doc.data().dateString));
+                                });
+                        });
+                }
+
+		function populateUpcomingHackathonModalMore() {
+                	db.collection("hackathons").orderBy("date", "desc").orderBy("name").limit(30).startAfter(modalCursor).get().then((querySnapshot) => {
+                                querySnapshot.forEach((doc) => {
+                                        modalCursor = doc;
+                                        $("#putModalUpcomingHackathonsHere").append(createModalHackathonCard(doc.data().id, doc.data().name, doc.data().logoURL,  doc.data().location, doc.data().dateString));
+                                });
+                	}); 
+                }		
+
+		function populateAttendedHackathonModal() {
+                        db.collection("hackathons").orderBy("date", "desc").orderBy("name").limit(30).get().then((querySnapshot) => {
+                                querySnapshot.forEach((doc) => {
+                                        modalCursor = doc;
+                                        $("#putModalAttendedHackathonsHere").append(createModalHackathonCard(doc.data().id, doc.data().name, doc.data().logoURL,  doc.data().location, doc.data().dateString));
+                                });
+                        });
+                }
+
+                function populateAttendedHackathonModalMore() {
+                        db.collection("hackathons").orderBy("date", "desc").orderBy("name").limit(30).startAfter(modalCursor).get().then((querySnapshot) => {
+                                querySnapshot.forEach((doc) => {
+                                        modalCursor = doc;
+                                        $("#putModalAttendedHackathonsHere").append(createModalHackathonCard(doc.data().id, doc.data().name, doc.data().logoURL,  doc.data().location, doc.data().dateString));
+                                });
+                        }); 
+                }        
+
+		nopedOut = false;
+		$("#declineAddStickers").click(function() {
+			nopedOut = true;
+		});
+
+		$(".declineAddHackathons").click(function() {
+                        nopedOut = true;
+                });
+
+
+		function teardownStickerModal() {
+			if(!nopedOut) {
+				if(stickersToAdd.length != 0) {
+					for(var i = 0; i < stickersToAdd.length; i++) {
+						addStickerToUsersCollection(stickersToAdd[i]);
+					}
+				}
+				modalCursor = null;
+				$("#putModalStickersHere").empty();
+			}
+			nopedOut = false;
+		}
+
+		function teardownUpcomingHackathonModal() {
+			if(!nopedOut) {
+				if(hackathonsToAdd.length != 0) {
+					for(var i = 0; i < hackathonsToAdd.length; i++) {
+						addUpcomingHackathonToUsersCollection(hackathonsToAdd[i]);
+					}
+				}
+				modalCursor = null;
+				$("#putModalUpcomingHackathonssHere").empty();
+			}
+			nopedOut = false;
+		}	
+
+		function teardownAttendedHackathonModal() {
+                        if(!nopedOut) {
+                                if(hackathonsToAdd.length != 0) {
+                                        for(var i = 0; i < hackathonsToAdd.length; i++) {
+                                                addAttendedHackathonToUsersCollection(hackathonsToAdd[i]);
+                                        }
+                                }
+                                modalCursor = null;
+                                $("#putModalAttendedHackathonssHere").empty();
+                        }
+                        nopedOut = false;
+                }     
+
+		function addStickerToUsersCollection(stickerId) {
+			db.collection("stickers").doc(stickerId).get().then(stickerDoc => {
+				data = {
+					id: stickerId,
+					name: stickerDoc.data().name,
+					numberOwned: 1,
+					dateAdded: new Date(), 
+				};	
+				db.collection("users").doc("{{ documentData['uid'] }}").collection("stickers").doc(stickerId).set(data);
+			});
+		}
+		
+		function addUpcomingHackathonToUsersCollection(hackathonId) {
+                        db.collection("hackathons").doc(hackathonId).get().then(hackathonDoc => {
+                                data = {
+                                        id: hackathonId,
+                                        name: hackathonDoc.data().name,
+                                        dateString: hackathonDoc.data().dateString,
+                                        location: hackathonDoc.data().location,
+					date: hackathonDoc.data().date,
+					logoURL: hackathonDoc.data().logoURL 
+                                };      
+                                db.collection("users").doc("{{ documentData['uid'] }}").collection("upcomingHackathons").doc(hackathonId).set(data);
+                        });
+                }
+
+		function addAttendedHackathonToUsersCollection(hackathonId) {
+                        db.collection("hackathons").doc(hackathonId).get().then(hackathonDoc => {
+                                data = {
+                                        id: hackathonId,
+                                        name: hackathonDoc.data().name,
+                                        dateString: hackathonDoc.data().dateString,
+                                        location: hackathonDoc.data().location,
+                                        date: hackathonDoc.data().date,
+					logoURL: hackathonDoc.data().logoURL
+                                };      
+                                db.collection("users").doc("{{ documentData['uid'] }}").collection("attendedHackathons").doc(hackathonId).set(data);
+                        });
+                }	
+
+		function createModalStickerCard(id, image) {
+                        var html = '<div id="' + id + '-modal-sticker" class="modal-sticker-container col s12 m4 l3">' +
+                                        '<div class="sticker hoverable">' +
+                                                '<img id="' + id + '-img" class="modal-sticker-image sticker-image" src="' + image + '">' +
+                                        	'<i id="' + id + '-i" class="material-icons sticker-check-box">check_box_outline_blank</i>' + 
+					'</div>' +
+                                '</div>'
+                        return html;
+                }
+
+		function createModalHackathonCard(id, name, logo, location, date) {
+                        var html = '<div id="' + id + '-modal-hackathon" class="modal-hackathon-container col s12 m12 l6">' +  
+					'<div class="card-panel grey lighten-5 z-depth-1 hoverable">' +
+						'<div class="row valign-wrapper">' +
+							'<div class="col s4">' +
+								'<div class="logo-container valign-wrapper">' +
+									'<img class="hackathon-logo" src="' + logo + '" alt="' + name + '">' +
+								'</div>' +
+							'</div>' +
+							'<div class="col s8 ljust">' +
+								'<span class="black-text">' + name + '</span>' +
+								'<br>' +
+								'<span class="black-text">' + location + '</span>' +
+								'<br>' +
+								'<span class="black-text">' + date + '</span>' +
+							'</div>' +
+						'</div>' +
+					'</div>' +
+					'<i id="' + id + '-i" class="material-icons hackathon-check-box">check_box_outline_blank</i>' + 
+                                '</div>';
+                        return html;          
+                }	
+		
+		stickersToAdd = [];
+		hackathonsToAdd = [];
+		$(".putModalHackathonsHere").on("click", ".modal-hackathon-container", function() {
+			if(hackathonsToAdd.indexOf($(this).attr("id").split("-modal-hackathon")[0]) > -1) {
+                                hackathonsToAdd.splice(hackathonsToAdd.indexOf($(this).attr("id").split("-modal-hackathon")[0]), 1);
+                                $("#" + $(this).attr("id").split("-modal-hackathon")[0] + "-i").text("check_box_outline_blank");
+                        } else {
+                                hackathonsToAdd.push($(this).attr("id").split("-modal-hackathon")[0]);
+                                $("#" + $(this).attr("id").split("-modal-hackathon")[0] + "-i").text("check_box");
+                        }
+                        if(hackathonsToAdd.length > 0) {
+                                $(".confirmAddHackathons").removeClass("disabled");
+                        } else {
+                                $(".confirmAddHackathons").addClass("disabled");
+                        }
+		});
+
+		$("#putModalStickersHere").on("click", ".modal-sticker-container", function() {
+			if(stickersToAdd.indexOf($(this).attr("id").split("-modal-sticker")[0]) > -1) {
+				stickersToAdd.splice(stickersToAdd.indexOf($(this).attr("id").split("-modal-sticker")[0]), 1);
+				$("#" + $(this).attr("id").split("-modal-sticker")[0] + "-i").text("check_box_outline_blank");
+			} else {
+				stickersToAdd.push($(this).attr("id").split("-modal-sticker")[0]);
+				$("#" + $(this).attr("id").split("-modal-sticker")[0] + "-i").text("check_box");
+			}
+			if(stickersToAdd.length > 0) {
+				$("#confirmAddStickers").removeClass("disabled");
+			} else {
+				$("#confirmAddStickers").addClass("disabled");
+			}
+		});
+
+                $("#loadMoreModalStickersButton").click(function() {
+			populateStickerModalMore();
+		});
+			
+                $("#loadMoreModalUpcomingHackathonsButton").click(function() {
+			populateUpcomingHackathonModalMore();
+		});	
+		
+		$("#loadMoreModalAttendedHackathonsButton").click(function() {
+                        populateAttendedHackathonModalMore();
+                });	
+        </script>
+{% end %}
+ 
+
+

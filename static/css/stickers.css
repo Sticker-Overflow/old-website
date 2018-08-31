@@ -1,0 +1,34 @@
+#main {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.sticker-image {
+	width: 75%;
+}
+
+.rjust {
+	text-align: right;
+	text-justify: true;
+}
+
+.ljust {
+	text-align: left;
+	text-justify: true;
+}
+
+.row {
+	margin-bottom: 0px !important;
+}
+
+.info-title {
+	float:none !important;
+}
+
+html, body, .block {
+	height: 100%;
+}
+
+.materialboxed {
+	display: inline !important;
+}

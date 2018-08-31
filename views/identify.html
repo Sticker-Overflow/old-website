@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %} Identify a Sticker {% end %}
+
+{% block navtitle %} ID a Sticker {% end %}
+
+{% block main %} 
+	<div id="main">
+		<h1>Upload Photo</h1>
+		<form id="upload-form" action="#">
+			<div class="row">
+				<div class="col s12 m6 offset-m1 l4 offset-l3">
+					<div class="file-field input-field">
+						<div class="btn">
+							<span>File</span>
+							<input type="file" id="file-select" name="picture" single>
+						</div>
+						<div class="file-path-wrapper">
+							<input class="file-path validate" type="text">
+						</div>
+					</div>
+				</div>
+				<div class="col s12 m3 l3">
+					<button id="btn" class="btn waves-effect waves-light" type="submit" name="action">Submit
+						<i class="material-icons right">file_upload</i>
+					</button>
+				</div>
+			</div>
+			
+		</form>
+
+		<div id="response"></div>
+			<div class="row">
+				<div id="image-list" class="col s12 m8 offset-m2 l6 offset-l3">
+
+				</div>
+			</div>
+		</div>
+	</div>
+{% end %}
+
+{% block css %}
+	<link type="text/css" rel="stylesheet" href="/static/css/identify.css" media="screen,projection"/>
+{% end %}
+
+{% block javascript %}
+	<script type="text/javascript" src="/static/js/identify.js"></script>
+{% end %}

@@ -1,0 +1,42 @@
+#main {
+        text-align: center;
+        margin-bottom: 2rem;
+}
+
+img.organizer-logo {
+	width: 100px;
+}
+
+.logo-container {
+	height: 100px;
+}
+
+.row {
+        margin-bottom: 0px !important;
+}
+
+.rjust {
+        text-align: right;
+        text-justify: true;
+}
+
+.ljust {
+        text-align: left;
+        text-justify: true;
+}
+
+.info-title {
+        float:none !important;
+}
+
+html, body, .block {
+        height: 100%;
+}
+
+.materialboxed {
+        display: inline !important;
+}
+
+#organizer-image {
+	width: 300px;
+}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %} Users {% end %}
+
+{% block navtitle %} Users {% end %}
+
+{% block main %} 
+	<div id="main">
+		<div class="row">
+			<div class="col s10 offset-s1 m8 offset-m2 l6 offset-l3">
+				<ul id="putUsersHere" class="collection">
+
+				</ul>
+			</div>
+		</div>
+		<a id="loadMoreButton" class="waves-effect waves-light btn-large center-align">Load More Users</a>
+	</div>
+{% end %}
+
+{% block css %}
+	<link type="text/css" rel="stylesheet" href="/static/css/users.css" media="screen,projection"/>
+{% end %}
+
+{% block javascript %}
+	<script type="text/javascript" src="/static/js/users.js"></script>
+{% end %}
+
+   

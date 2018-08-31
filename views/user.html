@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %} {{ documentData['name'] }} {% end %}
+
+{% block navtitle %} {{ documentData["name"] }} {% end %}
+
+{% block main %} 
+	<div id="main">
+		<!--<div class="row">
+			<div class="col s8 offset-s2 m6 offset-m3 l4 offset-l4">
+				<div class="card-panel grey lighten-5 z-depth-1"i>
+					<div class="row valign-wrapper">
+						<div class="col s12">
+							<img id="user-image" class="materialboxed responsize-img circle" src="{{ documentData['photoUrl'] }}" alt="{{documentData['name'] }}">
+						</div>
+					</div>
+				</div>	
+			</div>	
+		</div>-->	
+		<div class="row">
+			<div id="upcomingHackathons" class="col s12 m6 l3">
+				<h4 class="black-text">Upcoming Hackathons</h4>
+				<div id="putUpcomingHackathonsHere" class="row">
+				
+				</div>	
+			</div>
+			<div id="attendedHackathons" class="col s12 m6 l3">
+				<h4 class="black-text">Attended Hackathons</h4>
+				<div id="putAttendedHackathonsHere" class="row">
+				
+				</div>		
+			</div>
+			<div id="stickers" class="col s12 m12 l6">
+				<h4 class="black-text">Stickers</h4>
+				<div id="putStickersHere" class="row">
+				
+				</div>		
+			</div>
+		</div>
+
+	</div>
+{% end %}
+
+{% block css %}
+	<link type="text/css" rel="stylesheet" href="/static/css/users.css" media="screen,projection"/>
+{% end %}
+
+{% block javascript %}
+	<script>
+		$(document).ready(function(){	
+			$("#search-icon").hide();
+			var config = {
+                                apiKey: "AIzaSyC5x_SZTHN8UcVYw2aQioJE2fOqXdE3Mcg",
+                                authDomain: "stickeroverflow-1d318.firebaseapp.com",
+                                databaseURL: "https://stickeroverflow-1d318.firebaseio.com",
+                                projectId: "stickeroverflow-1d318",
+                                storageBucket: "stickeroverflow-1d318.appspot.com",
+                                messagingSenderId: "951520957692"
+                        };
+                        firebase.initializeApp(config);
+                
+                        var db = firebase.firestore();
+                        var storage = firebase.storage();
+
+			db.collection("users").doc("{{ documentData['uid'] }}").collection("stickers").orderBy("dateAdded", "desc").orderBy("name").get().then((querySnapshot) => {
+                                querySnapshot.forEach((stickerDoc) => {
+					storage.ref("stickers/" + stickerDoc.data().id + "/" + stickerDoc.data().id + ".png").getDownloadURL().then(function(url) {
+						$("#putStickersHere").append(createStickerCard(stickerDoc.data().id, url));
+					});                                       
+				});
+                        });
+
+                        db.collection("users").doc("{{ documentData['uid'] }}").collection("upcomingHackathons").orderBy("date", "desc").orderBy("name").get().then((querySnapshot) => {
+                                querySnapshot.forEach((hackathonDoc) => {
+                                        $("#putUpcomingHackathonsHere").append(createHackathonCard(hackathonDoc.data().id, hackathonDoc.data().name, hackathonDoc.data().logoURL, hackathonDoc.data().location, hackathonDoc.data().dateString));
+                                });
+                        });
+			
+			db.collection("users").doc("{{ documentData['uid'] }}").collection("attendedHackathons").orderBy("date", "desc").orderBy("name").get().then((querySnapshot) => {
+                                querySnapshot.forEach((hackathonDoc) => {
+                                        $("#putAttendedHackathonsHere").append(createHackathonCard(hackathonDoc.data().id, hackathonDoc.data().name, hackathonDoc.data().logoURL, hackathonDoc.data().location, hackathonDoc.data().dateString));
+                                });
+                        });			
+		});
+		
+		function createStickerCard(id, image) {
+			var html = '<div class="col s6 m6 l4">' +
+					'<div id="' + id + '" class="sticker hoverable">' +
+						'<a href="/stickers/' + id + '"><img class="sticker-image" src="' + image + '"></a>' +
+					'</div>' +
+				'</div>'
+			return html;
+		}
+
+		function createHackathonCard(id, name, logo, location, date) {
+			 var html = '<div class="col s12">' +  
+					'<a href="/hackathons/' + id + '">' +
+						'<div id="' + id + '" class="card-panel grey lighten-5 z-depth-1 hoverable">' +
+							'<div class="row valign-wrapper">' +
+								'<div class="col s4">' +
+									'<div class="logo-container valign-wrapper">' +
+										'<img class="hackathon-logo clickable" src="' + logo + '" alt="' + name + '">' +
+									'</div>' +
+								'</div>' +
+								'<div class="col s8 ljust">' +
+									'<span class="black-text">' + name + '</span>' +
+									'<br>' +
+									'<span class="black-text">' + location + '</span>' +
+									'<br>' +
+									'<span class="black-text">' + date + '</span>' +
+								'</div>' +
+							'</div>' +
+						'</div>' +
+					'</a>' +
+				'</div>';
+			return html;          
+		}
+	</script>
+{% end %}

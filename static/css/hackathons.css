@@ -1,0 +1,48 @@
+#main {
+        text-align: center;
+        margin-bottom: 2rem;
+}
+
+.hackathon-name {
+	font-size: 1.2rem;
+}
+
+.hackathon-logo {
+	width: 25%;
+	margin: 0;
+	position: absolute;
+    	top: 66%;
+    	left: 50%;
+    	transform: translate(-50%, -50%);
+}
+
+.hackathon-image {
+	width: 85%;
+}
+
+.row {
+        margin-bottom: 0px !important;
+}
+
+.rjust {
+        text-align: right;
+        text-justify: true;
+}
+
+.ljust {
+        text-align: left;
+        text-justify: true;
+}
+
+.info-title {
+        float:none !important;
+}
+
+html, body, .block {
+        height: 100%;
+}
+
+.materialboxed {
+        display: inline !important;
+}
+
